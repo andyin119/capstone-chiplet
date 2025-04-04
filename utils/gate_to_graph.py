@@ -6,16 +6,22 @@ from typing import Dict, List, Set
 
 class GateParser:
     def __init__(self, verilog_path: str, rpt_path: str):
-        """Initialize GateParser.
+        """
+        Initialize GateParser.
 
         Initializes a GateParser object with specified Verilog and report file paths.
 
-        Args:
-            verilog_path (str): Path to the Verilog file.
-            rpt_path (str): Path to the gate report file.
+        Parameters
+        ----------
+        verilog_path : str
+            Path to the Verilog file.
 
-        Returns:
-            None
+        rpt_path : str
+            Path to the gate report file.
+
+        Returns
+        -------
+        None
         """
         self.verilog_path = verilog_path
         self.rpt_path = rpt_path
@@ -24,15 +30,20 @@ class GateParser:
         self.net_connections: Dict[str, List[str]] = defaultdict(list)
 
     def parse_gate_report(self):
-        """Parse gate report file.
+        """
+        Parse gate report file.
 
         Parses the gate report file to extract gate area and leakage power information.
+        The method reads through the report line-by-line, stopping at the total line,
+        and stores the relevant data for each gate type in the gate library.
 
-        Args:
-            None
+        Parameters
+        ----------
+        None
 
-        Returns:
-            None
+        Returns
+        -------
+        None
         """
         # Open the gate report file and process it line-by-line.
         with open(self.rpt_path) as f:
@@ -54,15 +65,22 @@ class GateParser:
                     }
 
     def expand_wires(self, wire_str: str):
-        """Expand wire string.
+        """
+        Expand wire string.
 
         Expands a signal string with bus notation into a list of individual signals.
+        The method handles bus ranges and single signals, returning a clean list
+        of signal names.
 
-        Args:
-            wire_str (str): The wire string possibly containing bus notation.
+        Parameters
+        ----------
+        wire_str : str
+            The wire string possibly containing bus notation.
 
-        Returns:
-            List[str]: A list of individual signal names.
+        Returns
+        -------
+        List[str]
+            A list of individual signal names.
         """
         # Remove leading and trailing whitespace
         wire_str = wire_str.strip()
@@ -84,15 +102,21 @@ class GateParser:
             return [wire_str.lstrip("\\")]
 
     def store_wires(self, wire_str: str):
-        """Store wires from declaration.
+        """
+        Store wires from declaration.
 
         Processes a wire declaration line to extract and store individual signal names.
+        The method cleans the declaration and expands any bus notation to ensure
+        all signals are recorded.
 
-        Args:
-            wire_str (str): The wire declaration string.
+        Parameters
+        ----------
+        wire_str : str
+            The wire declaration string.
 
-        Returns:
-            None
+        Returns
+        -------
+        None
         """
         # strip wire declaration
         wire_str = re.sub(r"^\s*wire\s+", "", wire_str)
@@ -109,18 +133,25 @@ class GateParser:
                     self.net_connections[signal] = []
 
     def store_connections(self, inst: str, ports_str: str):
-        """Store gate instance connections.
+        """
+        Store gate instance connections.
 
         Stores the connections of a gate instance to its nets based on port string.
+        The method extracts nets from the port connections and manages packed wires,
+        ensuring all connections are appropriately recorded.
 
-        Args:
-            inst (str): The instance name.
-            ports_str (str): The string containing port connections.
+        Parameters
+        ----------
+        inst : str
+            The instance name.
 
-        Returns:
-            None
+        ports_str : str
+            The string containing port connections.
+
+        Returns
+        -------
+        None
         """
-
         # Find all nets used in the port connections (pattern: .<port>(net_name)).
         nets_in_inst = re.findall(r"\(([^)]*)\)", ports_str)
 
@@ -154,15 +185,21 @@ class GateParser:
                     self.net_connections[net].append(inst)
 
     def store_instances(self, inst: str):
-        """Store gate instance.
+        """
+        Store gate instance.
 
         Stores a gate instance along with its parameters and connections.
+        The method parses the instance declaration, retrieves gate information,
+        and records the instance in the gate instances list.
 
-        Args:
-            inst (str): The gate instance declaration string.
+        Parameters
+        ----------
+        inst : str
+            The gate instance declaration string.
 
-        Returns:
-            None
+        Returns
+        -------
+        None
         """
         # Match a gate instantiation of the form: <gate_type> <instance_name> ( ... )
         # Skip if the line does not match the expected format.
@@ -196,15 +233,20 @@ class GateParser:
         self.store_connections(inst_name, ports_str)
 
     def parse_verilog_netlist(self):
-        """Parse Verilog netlist.
+        """
+        Parse Verilog netlist.
 
         Parses the Verilog netlist to extract gate instances and net connections from the ChipTop module.
+        The method reads the file, identifies the ChipTop module, and processes its content to
+        store instances and connections appropriately.
 
-        Args:
-            None
+        Parameters
+        ----------
+        None
 
-        Returns:
-            None
+        Returns
+        -------
+        None
         """
         # Read the entire Verilog file contents.
         with open(self.verilog_path) as f:
@@ -237,29 +279,39 @@ class GateParser:
                 print(f"Warning: Unrecognized line in module content: {inst}")
 
     def write_gate_instances(self, output_path: str):
-        """Write gate instances to JSON.
+        """
+        Write gate instances to JSON.
 
         Writes the list of gate instances to a specified JSON file.
+        The method formats the instances into JSON and saves them to the given path.
 
-        Args:
-            output_path (str): The file path to write gate instances JSON.
+        Parameters
+        ----------
+        output_path : str
+            The file path to write gate instances JSON.
 
-        Returns:
-            None
+        Returns
+        -------
+        None
         """
         with open(output_path, "w") as f:
             json.dump(self.gate_instances, f, indent=2)
 
     def write_net_connections(self, output_path: str):
-        """Write net connections to JSON.
+        """
+        Write net connections to JSON.
 
         Formats and writes the net connections to a specified JSON file.
+        The method prepares the connections data and saves it in a structured JSON format.
 
-        Args:
-            output_path (str): The file path to write net connections JSON.
+        Parameters
+        ----------
+        output_path : str
+            The file path to write net connections JSON.
 
-        Returns:
-            None
+        Returns
+        -------
+        None
         """
         formatted = [
             {"net": net, "connections": gates}
@@ -269,16 +321,24 @@ class GateParser:
             json.dump(formatted, f, indent=2)
 
     def run(self, gate_output: str, net_output: str):
-        """Run gate parsing process.
+        """
+        Run gate parsing process.
 
-        Executes the parsing of the gate report and Verilog netlist, and writes the results to JSON files.
+        Executes the parsing of the gate report and Verilog netlist, and writes
+        the results to JSON files. This method orchestrates the overall parsing
+        workflow and provides summary information about the parsed data.
 
-        Args:
-            gate_output (str): The file path for gate instances JSON.
-            net_output (str): The file path for net connections JSON.
+        Parameters
+        ----------
+        gate_output : str
+            The file path for gate instances JSON.
 
-        Returns:
-            None
+        net_output : str
+            The file path for net connections JSON.
+
+        Returns
+        -------
+        None
         """
         # Parse the gate report to build the gate library.
         self.parse_gate_report()
@@ -297,15 +357,20 @@ class GateParser:
 
 
 def main():
-    """Main entry point.
+    """
+    Main entry point.
 
     Parses command-line arguments and runs the GateParser to generate JSON outputs.
+    This method sets up the argument parser and initiates the parsing process
+    based on user-specified file paths.
 
-    Args:
-        None
+    Parameters
+    ----------
+    None
 
-    Returns:
-        None
+    Returns
+    -------
+    None
     """
     import argparse
 
