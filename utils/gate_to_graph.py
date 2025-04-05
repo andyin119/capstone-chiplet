@@ -5,7 +5,9 @@ from typing import Dict, List, Set
 
 
 class GateParser:
-    def __init__(self, verilog_path: str, rpt_path: str):
+    def __init__(
+        self, verilog_path: str, gate_rpt_path: str, power_rpt_path: str = None
+    ):
         """
         Initialize GateParser.
 
@@ -16,7 +18,7 @@ class GateParser:
         verilog_path : str
             Path to the Verilog file.
 
-        rpt_path : str
+        gate_rpt_path : str
             Path to the gate report file.
 
         Returns
@@ -24,14 +26,15 @@ class GateParser:
         None
         """
         self.verilog_path = verilog_path
-        self.rpt_path = rpt_path
+        self.gate_rpt_path = gate_rpt_path
+        self.power_rpt_path = power_rpt_path
         self.gate_library: Dict[str, Dict[str, float]] = {}
         self.gate_instances: List[Dict[str, object]] = []
         self.net_connections: Dict[str, List[str]] = defaultdict(list)
 
-    def parse_gate_report(self):
+    def parse_gate_reports(self):
         """
-        Parse gate report file.
+        Parse gate report files.
 
         Parses the gate report file to extract gate area and leakage power information.
         The method reads through the report line-by-line, stopping at the total line,
@@ -46,7 +49,7 @@ class GateParser:
         None
         """
         # Open the gate report file and process it line-by-line.
-        with open(self.rpt_path) as f:
+        with open(self.gate_rpt_path) as f:
             for line in f:
                 # Stop processing if a line starts with 'total' (case-insensitive)
                 if line.strip().lower().startswith("total"):
@@ -55,14 +58,33 @@ class GateParser:
                 match = re.match(r"^\s*(\S+)\s+\d+\s+([\d.]+)\s+([\d.]+)", line)
                 if match:
                     gate, area, leakage = match.groups()
-                    # For debugging specific gate (example gate name provided)
-                    if gate == "sram22_1024x32m8w8":
-                        print(f"Gate: {gate}, Area: {area}, Leakage: {leakage}")
                     # Store the area and leakage power for the gate type.
                     self.gate_library[gate] = {
                         "area": float(area),
-                        "leakage_power": float(leakage),
                     }
+
+        if self.power_rpt_path:
+            with open(self.power_rpt_path) as f:
+                for line in f:
+                    # Match lines with gate name, area, and leakage values.
+                    match = re.match(
+                        r"^\s*([\d.eE+-]+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+([A-Za-z0-9_]+)",
+                        line,
+                    )
+                    if match:
+                        leakage, internal, switching, total, gate = match.groups()
+                        # Store the area and leakage power for the gate type.
+                        if gate not in self.gate_library:
+                            print(f"Warning: Gate {gate} not found in library.")
+                            continue
+                        self.gate_library[gate].update(
+                            {
+                                "leakage_power": float(leakage),
+                                "internal_power": float(internal),
+                                "switching_power": float(switching),
+                                "total_power": float(total),
+                            }
+                        )
 
     def expand_wires(self, wire_str: str):
         """
@@ -211,14 +233,26 @@ class GateParser:
         # Extract the gate type and instance name from the match.
         gate_type, inst_name = header_match.groups()
         # Get gate information from the gate library, use -1 if not found.
-        gate_info = self.gate_library.get(gate_type, {"area": -1, "leakage_power": -1})
+        gate_info = self.gate_library.get(
+            gate_type,
+            {
+                "area": -1,
+                "leakage_power": -1,
+                "internal_power": -1,
+                "switching_power": -1,
+                "total_power": -1,
+            },
+        )
         # Record the gate instance with its associated parameters.
         self.gate_instances.append(
             {
                 "node": inst_name,
                 "gate": gate_type,
                 "area": gate_info["area"],
-                "leakage_power": gate_info["leakage_power"],
+                "leakage_power": gate_info.get("leakage_power", -1),
+                "internal_power": gate_info.get("internal_power", -1),
+                "switching_power": gate_info.get("switching_power", -1),
+                "total_power": gate_info.get("total_power", -1),
             }
         )
 
@@ -341,7 +375,7 @@ class GateParser:
         None
         """
         # Parse the gate report to build the gate library.
-        self.parse_gate_report()
+        self.parse_gate_reports()
         # Parse the Verilog netlist to extract gate instances and net connections.
         self.parse_verilog_netlist()
         # Print summary information.
@@ -378,7 +412,8 @@ def main():
     # example usage: python gate_to_graph.py --verilog ChipTop.flat.v --rpt final_gates.rpt
     parser = argparse.ArgumentParser(description="Parse Verilog and report to JSON.")
     parser.add_argument("--verilog", required=True, help="Path to ChipTop.flat.v")
-    parser.add_argument("--rpt", required=True, help="Path to final_gates.rpt")
+    parser.add_argument("--area_rpt", required=True, help="Path to final_gates.rpt")
+    parser.add_argument("--pwr_rpt", required=False, help="Path to power_per_cell.rpt")
     parser.add_argument(
         "--gate_json",
         default="gate_instances.json",
@@ -393,7 +428,10 @@ def main():
     args = parser.parse_args()
 
     # Create a GateParser instance with the provided file paths.
-    gp = GateParser(args.verilog, args.rpt)
+    if args.pwr_rpt:
+        gp = GateParser(args.verilog, args.area_rpt, args.pwr_rpt)
+    else:
+        gp = GateParser(args.verilog, args.rpt)
     # Run the parser to generate the JSON outputs.
     gp.run(args.gate_json, args.net_json)
 
