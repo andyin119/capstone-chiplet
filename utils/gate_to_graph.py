@@ -6,17 +6,17 @@ from typing import Dict, List, Set
 
 class GateParser:
     def __init__(
-        self, verilog_path: str, gate_rpt_path: str, power_rpt_path: str = None
+        self, netlist_path: str, gate_rpt_path: str, power_rpt_path: str = None
     ):
         """
         Initialize GateParser.
 
-        Initializes a GateParser object with specified Verilog and report file paths.
+        Initializes a GateParser object with specified netlist and report file paths.
 
         Parameters
         ----------
-        verilog_path : str
-            Path to the Verilog file.
+        netlist_path : str
+            Path to the netlist file.
 
         gate_rpt_path : str
             Path to the gate report file.
@@ -25,7 +25,7 @@ class GateParser:
         -------
         None
         """
-        self.verilog_path = verilog_path
+        self.netlist_path = netlist_path
         self.gate_rpt_path = gate_rpt_path
         self.power_rpt_path = power_rpt_path
         self.gate_library: Dict[str, Dict[str, float]] = {}
@@ -266,11 +266,11 @@ class GateParser:
         # Store the instance in the net_connections dictionary for each net it connects to.
         self.store_connections(inst_name, ports_str)
 
-    def parse_verilog_netlist(self):
+    def parse_netlist(self):
         """
-        Parse Verilog netlist.
+        Parse verilog netlist.
 
-        Parses the Verilog netlist to extract gate instances and net connections from the ChipTop module.
+        Parses the verilog netlist to extract gate instances and net connections from the ChipTop module.
         The method reads the file, identifies the ChipTop module, and processes its content to
         store instances and connections appropriately.
 
@@ -282,15 +282,15 @@ class GateParser:
         -------
         None
         """
-        # Read the entire Verilog file contents.
-        with open(self.verilog_path) as f:
+        # Read the entire netlist file contents.
+        with open(self.netlist_path) as f:
             content = f.read()
         # Extract the content inside the ChipTop module.
         module_match = re.search(
             r"module\s+ChipTop.*?;(.*?)endmodule", content, re.DOTALL
         )
         if not module_match:
-            print("ChipTop module not found in verilog file.")
+            print("ChipTop module not found in netlist file.")
             return
         module_content = module_match.group(1)
 
@@ -358,7 +358,7 @@ class GateParser:
         """
         Run gate parsing process.
 
-        Executes the parsing of the gate report and Verilog netlist, and writes
+        Executes the parsing of the gate report and netlist, and writes
         the results to JSON files. This method orchestrates the overall parsing
         workflow and provides summary information about the parsed data.
 
@@ -376,8 +376,8 @@ class GateParser:
         """
         # Parse the gate report to build the gate library.
         self.parse_gate_reports()
-        # Parse the Verilog netlist to extract gate instances and net connections.
-        self.parse_verilog_netlist()
+        # Parse the netlist to extract gate instances and net connections.
+        self.parse_netlist()
         # Print summary information.
         print(f"Parsed {len(self.gate_instances)} gate instances.")
         total_nets = sum(len(conns) for conns in self.net_connections.values())
@@ -409,9 +409,9 @@ def main():
     import argparse
 
     # Set up the argument parser and define command-line options.
-    # example usage: python gate_to_graph.py --verilog ChipTop.flat.v --rpt final_gates.rpt
-    parser = argparse.ArgumentParser(description="Parse Verilog and report to JSON.")
-    parser.add_argument("--verilog", required=True, help="Path to ChipTop.flat.v")
+    # example usage: python gate_to_graph.py --netlist ChipTop.flat.v --rpt final_gates.rpt
+    parser = argparse.ArgumentParser(description="Parse netlist and report to JSON.")
+    parser.add_argument("--netlist", required=True, help="Path to ChipTop.flat.v")
     parser.add_argument("--area_rpt", required=True, help="Path to final_gates.rpt")
     parser.add_argument("--pwr_rpt", required=False, help="Path to power_per_cell.rpt")
     parser.add_argument(
@@ -429,9 +429,9 @@ def main():
 
     # Create a GateParser instance with the provided file paths.
     if args.pwr_rpt:
-        gp = GateParser(args.verilog, args.area_rpt, args.pwr_rpt)
+        gp = GateParser(args.netlist, args.area_rpt, args.pwr_rpt)
     else:
-        gp = GateParser(args.verilog, args.rpt)
+        gp = GateParser(args.netlist, args.rpt)
     # Run the parser to generate the JSON outputs.
     gp.run(args.gate_json, args.net_json)
 

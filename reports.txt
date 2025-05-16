@@ -1,0 +1,95 @@
+*	Parasitic Files used:
+*       Dynamic View: tt_025C_1v80.extra_view
+*       Leakage View: tt_025C_1v80.extra_view
+*       User-Defined Activity : N.A.
+*       Activity File: N.A.
+*       Hierarchical Global Activity: N.A.
+*       Global Activity: N.A.
+*       Sequential Element Activity: 0.200000
+*       Primary Input Activity: 0.200000
+*       Default icg ratio: N.A.
+*       Global Comb ClockGate Ratio: N.A.
+*	Power Units = 1mW
+*	Time Units = 1e-09 secs
+
+Layer 0
+    Hinst Name       Module Name          Inst Count           Total Area
+----------------------------------------------------------------------
+ChipTop                                        17701          2334614.911
+
+
+Total Power
+-----------------------------------------------------------------------------------------
+Total Internal Power:       17.29255503 	   70.3604%
+Total Switching Power:       7.25377395 	   29.5143%
+Total Leakage Power:         0.03080155 	    0.1253%
+Total Power:                24.57713053
+-----------------------------------------------------------------------------------------
+
+Layer 1
+    Hinst Name       Module Name          Inst Count           Total Area
+----------------------------------------------------------------------
+ChipTop                                        10900           304085.070
+
+Total Power
+-----------------------------------------------------------------------------------------
+Total Internal Power:        8.63326234 	   74.5460%
+Total Switching Power:       2.93516240 	   25.3444%
+Total Leakage Power:         0.01270065 	    0.1097%
+Total Power:                11.58112539
+-----------------------------------------------------------------------------------------
+
+Layer 2
+    Hinst Name       Module Name          Inst Count           Total Area
+----------------------------------------------------------------------
+ChipTop                                        33560           807084.690
+
+Total Power
+-----------------------------------------------------------------------------------------
+Total Internal Power:       21.90505180 	   71.5152%
+Total Switching Power:       8.69158684 	   28.3761%
+Total Leakage Power:         0.03328086 	    0.1087%
+Total Power:                30.62991951
+-----------------------------------------------------------------------------------------
+
+##########################################
+Simulated Annealing
+Layer 0
+    Hinst Name       Module Name          Inst Count           Total Area
+----------------------------------------------------------------------
+ChipTop                                        21139          1353667.621
+
+Total Power
+-----------------------------------------------------------------------------------------
+Total Internal Power:       18.20116877 	   72.1900%
+Total Switching Power:       6.98321230 	   27.6970%
+Total Leakage Power:         0.02848180 	    0.1130%
+Total Power:                25.21286288
+-----------------------------------------------------------------------------------------
+
+Layer 1
+    Hinst Name       Module Name          Inst Count           Total Area
+----------------------------------------------------------------------
+ChipTop                                        23662          1296787.462
+
+Total Power
+-----------------------------------------------------------------------------------------
+Total Internal Power:       16.79262322 	   71.4017%
+Total Switching Power:       6.69822403 	   28.4807%
+Total Leakage Power:         0.02766016 	    0.1176%
+Total Power:                23.51850741
+-----------------------------------------------------------------------------------------
+
+Layer 2
+    Hinst Name       Module Name          Inst Count           Total Area
+----------------------------------------------------------------------
+ChipTop                                        21439           963836.613
+
+Total Power
+-----------------------------------------------------------------------------------------
+Total Internal Power:       17.87136189 	   71.9365%
+Total Switching Power:       6.94440940 	   27.9529%
+Total Leakage Power:         0.02747560 	    0.1106%
+Total Power:                24.84324689
+-----------------------------------------------------------------------------------------
+
