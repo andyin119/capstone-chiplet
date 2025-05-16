@@ -1,7 +1,7 @@
 import json
 
 # Replace with your actual file path
-json_file_path = 'build/TinyRocketConfig/gate_instances.json'
+json_file_path = '../data/gate_instances.json'
 
 # Load the JSON data
 with open(json_file_path, 'r') as file:
