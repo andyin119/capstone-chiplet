@@ -54,3 +54,15 @@ Key Parameters:
 
 
 **Important:** Quadratic Programming implementation tend to take a long time to complete. It might take days to run on the full problem, it is recommended to test run on smaller datasets located in `data/subsampled_data`
+
+### Q-Learning
+Sample Command
+```
+python3 q_learning.py
+```
+
+### Reinforcement Learning
+Sample Command
+```
+python3 reinforcement_learning.py
+```
