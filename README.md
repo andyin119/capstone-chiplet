@@ -20,7 +20,7 @@ make graph
 ```
 # Partitioning Algorithms
 
-
+See README in partitioning dir for notes on how to run partioning scripts and related tools
 
 # Partition-to-Gate Netlist Generator
 
