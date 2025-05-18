@@ -56,10 +56,26 @@ Key Parameters:
 **Important:** Quadratic Programming implementation tend to take a long time to complete. It might take days to run on the full problem, it is recommended to test run on smaller datasets located in `data/subsampled_data`
 
 ### Q-Learning
+Description:
+This method applies reinforcement learning using Q-learning and a neural network (2-layer MLP) to learn gate-to-layer assignments that minimize a custom cost function.
+
 Sample Command
 ```
 python3 q_learning.py
 ```
+Configurable Parameters (in script):
+	•	epochs: number of training epochs (default: 30)
+	•	lr: learning rate (default: 1e-3)
+	•	gamma: discount factor (default: 0.9)
+	•	epsilon_decay: decay rate for exploration probability (default: 0.95)****
+ Output:
+	•	Best gate partitioning saved to data/q_learning_partition_result.txt
+	•	Final performance metrics printed at the end of training.
+
+Highlights:
+	•	Supports GPU acceleration (MPS or CUDA).
+	•	Includes per-layer area/power tracking and TSV/net power modeling.
+	•	Enforces a power constraint on the middle layer with a penalty term.
 
 ### Reinforcement Learning
 Sample Command
