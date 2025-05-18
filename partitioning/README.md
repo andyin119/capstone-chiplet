@@ -64,21 +64,45 @@ Sample Command
 python3 q_learning.py
 ```
 Configurable Parameters (in script):
-	•	epochs: number of training epochs (default: 30)
-	•	lr: learning rate (default: 1e-3)
-	•	gamma: discount factor (default: 0.9)
-	•	epsilon_decay: decay rate for exploration probability (default: 0.95)****
+* epochs: number of training epochs (default: 30)
+* lr: learning rate (default: 1e-3)
+* gamma: discount factor (default: 0.9)
+* epsilon_decay: decay rate for exploration probability (default: 0.95)****
  Output:
-	•	Best gate partitioning saved to data/q_learning_partition_result.txt
-	•	Final performance metrics printed at the end of training.
+* Best gate partitioning saved to data/q_learning_partition_result.txt
+* Final performance metrics printed at the end of training.
 
 Highlights:
-	•	Supports GPU acceleration (MPS or CUDA).
-	•	Includes per-layer area/power tracking and TSV/net power modeling.
-	•	Enforces a power constraint on the middle layer with a penalty term.
+* Supports GPU acceleration (MPS or CUDA).
+* Includes per-layer area/power tracking and TSV/net power modeling.
+* Enforces a power constraint on the middle layer with a penalty term.
 
 ### Reinforcement Learning
+Description:
+This algorithm uses a policy gradient–style reinforcement learning method to optimize chiplet partitioning by directly sampling actions (layer assignments) from a learned policy network. The reward is based on the reduction in total cost, which includes power, area imbalance, and TSV/net crossings.
+
+Model:
+* 2-layer neural network (RLModel)
+* Input: gate features (area and power)
+* Output: softmax over tier assignment probabilities
+
 Sample Command
 ```
 python3 reinforcement_learning.py
 ```
+Training Behavior:
+*Samples a partition for all gates in each epoch.
+*Computes cost and reward (difference from previous best).
+*Updates the policy to favor lower-cost assignments using REINFORCE-like updates.
+*Uses softmax sampling over tier logits with gradient descent.
+
+Output:
+*Final partition is saved to data/rl_partition_result.txt.
+*Cost breakdown includes:
+*Total cost
+*Net crossings and edge crossings
+*Global power and area imbalance
+*Per-layer power and area
+*Constraint penalty on middle layer
+
+
